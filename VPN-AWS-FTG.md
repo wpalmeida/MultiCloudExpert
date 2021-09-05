@@ -12,32 +12,41 @@ export vpcid02=<VPC-ID>
 
 
 aws ec2 create-subnet --vpc-id $vpcid01 --cidr-block 10.10.0.0/24 --tag-specification 'ResourceType=subnet,Tags=[{Key=Name,Value=AWS-subnet}]'
+    
 export subnetid01=<SUBNET-ID>
 
 aws ec2 create-subnet --vpc-id $vpcid02 --cidr-block 10.20.20.0/24 --tag-specification 'ResourceType=subnet,Tags=[{Key=Name,Value=ONPREMISE-external}]'
+    
 export subnetid02=<SUBNET-ID>
 
 aws ec2 create-subnet --vpc-id $vpcid02 --cidr-block 10.20.30.0/24 --tag-specification 'ResourceType=subnet,Tags=[{Key=Name,Value=ONPREMISE-internal}]'
+    
 export subnetid03=<SUBNET-ID>
 
 
 
 aws ec2 create-internet-gateway --tag-specification 'ResourceType=internet-gateway,Tags=[{Key=Name,Value=AWS-igw}]'
+    
 export igwid01=<IGW-ID>
+    
 
 aws ec2 create-internet-gateway --tag-specification 'ResourceType=internet-gateway,Tags=[{Key=Name,Value=ONPREMISE-igw}]'
+
 export igwid02=<IGW-ID>
 
 aws ec2 attach-internet-gateway --vpc-id $vpcid01 --internet-gateway-id $igwid01
 aws ec2 attach-internet-gateway --vpc-id $vpcid02 --internet-gateway-id $igwid02
 
 aws ec2 create-route-table --vpc-id $vpcid01 --tag-specification 'ResourceType=route-table,Tags=[{Key=Name,Value=AWS-rt}]'
+    
 export rtid01=<RT-ID>
 
 aws ec2 create-route-table --vpc-id $vpcid02 --tag-specification 'ResourceType=route-table,Tags=[{Key=Name,Value=ONPREMISE-rt-external}]'
+    
 export rtid02=<RT-ID>
 
 aws ec2 create-route-table --vpc-id $vpcid02 --tag-specification 'ResourceType=route-table,Tags=[{Key=Name,Value=ONPREMISE-rt-internal}]'
+    
 export rtid03=<RT-ID>
 
 aws ec2 create-route --route-table-id $rtid01 --destination-cidr-block 0.0.0.0/0 --gateway-id $igwid01
@@ -64,9 +73,11 @@ aws ec2 create-key-pair --key-name MyKeyPair --query "KeyMaterial" --output text
 chmod 400 MyKeyPair.pem
 
 aws ec2 create-security-group --group-name AWS-sg --description "Security group for AWS" --vpc-id $vpcid01
+    
 export sgid01=<SG-ID>
 
 aws ec2 create-security-group --group-name ONPREMISE-internal --description "Security group for ONPREMISE Internal" --vpc-id $vpcid02
+    
 export sgid02=<SG-ID>
 
 aws ec2 authorize-security-group-ingress --group-id $sgid01 --protocol tcp --port 22 --cidr 0.0.0.0/0
@@ -74,15 +85,19 @@ aws ec2 authorize-security-group-ingress --group-id $sgid02 --protocol tcp --por
 
 
 aws ec2 run-instances --image-id ami-a4827dc9 --count 1 --instance-type t2.micro --key-name MyKeyPair --security-group-ids $sgid01 --subnet-id $subnetid01 --tag-specification 'ResourceType=instance,Tags=[{Key=Name,Value=AWS-ec2}]'
+    
 export instid01=<INST-ID>
 
 aws ec2 run-instances --image-id ami-a4827dc9 --count 1 --instance-type t2.micro --key-name MyKeyPair --security-group-ids $sgid02 --subnet-id $subnetid03 --tag-specification 'ResourceType=instance,Tags=[{Key=Name,Value=ONPREMISE-ec2}]'
+    
 export instid02=<INST-ID>
 
 aws ec2 describe-instances --instance-id $instid01
+    
 export pubip01=<PUB-IP>
 
 aws ec2 describe-instances --instance-id $instid02
+    
 export pubip02=<PUB-IP>
 
 ssh -i "MyKeyPair.pem" ec2-user@$pubip01
@@ -91,11 +106,13 @@ ssh -i "MyKeyPair.pem" ec2-user@$pubip02
 -----------------------------------------
 
 aws ec2 allocate-address --tag-specification 'ResourceType=elastic-ip,Tags=[{Key=Name,Value=ONPREMISE-EIP}]'
+    
 export pubeip01=<PUB-IP>
 
 ----------------------------------------------
 
 aws ec2 create-vpn-gateway --type ipsec.1
+    
 export vgwid=<VGW-ID>
 
 aws ec2 attach-vpn-gateway --vpn-gateway-id $vgwid --vpc-id $vpcid01
