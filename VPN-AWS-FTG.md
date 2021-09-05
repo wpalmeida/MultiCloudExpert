@@ -2,9 +2,11 @@ https://docs.aws.amazon.com/pt_br/vpc/latest/userguide/vpc-subnets-commands-exam
 https://docs.fortinet.com/document/fortigate-public-cloud/7.0.0/aws-administration-guide/506140/connecting-a-local-fortigate-to-an-aws-vpc-vpn
 
 aws ec2 create-vpc --cidr-block 10.10.0.0/16 --tag-specification 'ResourceType=vpc,Tags=[{Key=Name,Value=AWS-vpc}]'
+
 export vpcid01=<VPC-ID>
 
 aws ec2 create-vpc --cidr-block 10.20.0.0/16 --tag-specification 'ResourceType=vpc,Tags=[{Key=Name,Value=ONPREMISE}]'
+    
 export vpcid02=<VPC-ID>
 
 
